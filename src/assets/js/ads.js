@@ -176,7 +176,15 @@
       }
       function go() { location.href = next; }
       wrap.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', go); });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') go(); });
+      wrap.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') go();
+        if (e.key !== 'Tab') return;
+        // Keep keyboard focus inside the dialog.
+        var f = wrap.querySelectorAll('a[href], button');
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
       document.body.appendChild(wrap);
       wrap.querySelector('[data-go]').focus();
     }

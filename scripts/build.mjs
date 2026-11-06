@@ -10,6 +10,8 @@ const OUT = path.join(root, 'site');
 const cfg = JSON.parse(fs.readFileSync(path.join(root, 'site.config.json'), 'utf8'));
 const countries = JSON.parse(fs.readFileSync(path.join(root, 'data', 'countries.json'), 'utf8'));
 const outlines = JSON.parse(fs.readFileSync(path.join(root, 'data', 'outlines.json'), 'utf8'));
+// A flat projection can't draw the South Pole; Antarctica gets a blank map cell instead.
+delete outlines.ATA;
 const SITE = cfg.siteUrl.replace(/\/$/, '');
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 
@@ -344,15 +346,16 @@ function home() {
     `<button type="button" class="chip" data-filter="${r.name}" aria-pressed="false" style="--region:${r.color}">${r.name}</button>`).join('');
   const body = `
 <section class="hero">
-  <h1>Facts on every country, from Afghanistan to Zimbabwe</h1>
-  <p class="hero__lede">${countries.length} countries and territories, with capitals, populations, flags, languages, currencies and neighbours.</p>
+  <div class="hero__text"><h1>Facts on every country, from Afghanistan to Zimbabwe</h1>
+  <p class="hero__lede">${countries.length} countries and territories, with capitals, populations, flags, languages, currencies and neighbours.</p></div>
   <form class="finder" role="search" onsubmit="return false">
     <label for="q" class="sr-only">Search countries</label>
     <input id="q" type="search" placeholder="Search by country or capital" autocomplete="off" data-finder>
     <div class="chips" role="group" aria-label="Filter by region"><button type="button" class="chip" data-filter="" aria-pressed="true">All</button>${chips}</div>
+    <p class="finder__count" aria-live="polite" data-count>Showing all ${countries.length}</p>
   </form>
-  <p class="finder__count" aria-live="polite" data-count>Showing all ${countries.length}</p>
 </section>
+<h2 class="sr-only">All countries</h2>
 ${grid(countries)}
 <p class="empty" data-empty hidden></p>
 `;
@@ -411,16 +414,16 @@ function rankingPage(R) {
   let tr = '';
   rows.forEach((c, i) => {
     const w = Math.max(0.5, (R.raw(c) / max) * 100);
-    tr += `<tr style="--region:${regionOf[c.region].color}"><td class="num">${i + 1}</td><td><a href="${url(c)}">${flag(c, 24)}<span>${esc(c.name)}</span></a></td><td class="num">${R.val(c)}</td><td class="bar" aria-hidden="true"><span style="width:${w.toFixed(1)}%"></span></td></tr>\n`;
-    if ((i + 1) % 30 === 0 && i + 1 < rows.length) tr += `<tr class="ad-row"><td colspan="4">${ad('inContent', 'leaderboard', ' ad--center')}</td></tr>\n`;
+    tr += `<tr style="--region:${regionOf[c.region].color}"><td class="num">${i + 1}</td><td><a href="${url(c)}">${flag(c, 24)}<span>${esc(c.name)}</span></a></td><td class="region">${esc(c.region)}</td><td class="num">${R.val(c)}</td><td class="bar" aria-hidden="true"><span style="width:${w.toFixed(1)}%"></span></td></tr>\n`;
+    if ((i + 1) % 30 === 0 && i + 1 < rows.length) tr += `<tr class="ad-row"><td colspan="5">${ad('inContent', 'leaderboard', ' ad--center')}</td></tr>\n`;
   });
   const others = RANKINGS.filter((x) => x !== R).map((x) => `<a href="/rankings/${x.slug}/">${x.title}</a>`).join('');
   const body = `
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/rankings/">Rankings</a><span aria-hidden="true">/</span><span>${R.title}</span></nav>
 <h1>${R.title}</h1>
-<p class="lede">${rows.length} countries and territories, ranked. ${R.note} Bar colour shows the region.</p>
+<p class="lede">${rows.length} countries and territories, ranked. ${R.note}</p>
 <div class="table-wrap"><table class="rank">
-<thead><tr><th scope="col" class="num">Rank</th><th scope="col">Country</th><th scope="col" class="num">${R.head}</th><th scope="col"><span class="sr-only">Relative size</span></th></tr></thead>
+<thead><tr><th scope="col" class="num">Rank</th><th scope="col">Country</th><th scope="col">Region</th><th scope="col" class="num">${R.head}</th><th scope="col"><span class="sr-only">Relative size</span></th></tr></thead>
 <tbody>
 ${tr}</tbody></table></div>
 <nav class="see-also" aria-label="Other rankings"><h2>Other rankings</h2>${others}</nav>`;
