@@ -1,0 +1,10 @@
+{
+  // Deploys site/ as static assets on Cloudflare Workers: `npx wrangler deploy`.
+  // For Cloudflare Pages, use build command `npm run build` and output directory `site` instead.
+  "name": "countryfacts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./site",
+    "not_found_handling": "404-page"
+  }
+}

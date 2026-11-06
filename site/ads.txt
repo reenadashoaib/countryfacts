@@ -1,0 +1,1 @@
+# Add your AdSense publisher ID to site.config.json (adsense.client) and rebuild.

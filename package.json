@@ -1,0 +1,12 @@
+{
+  "name": "countryfacts",
+  "private": true,
+  "type": "module",
+  "description": "Static country facts website with ad slots, built for Cloudflare.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepare-data": "node scripts/prepare-data.mjs",
+    "preview": "npx --yes serve@14.2.4 site -l 8080"
+  },
+  "engines": { "node": ">=18" }
+}

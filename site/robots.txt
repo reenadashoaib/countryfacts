@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://countryfacts.pages.dev/sitemap.xml
